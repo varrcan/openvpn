@@ -2,19 +2,19 @@
 
 
 if [[ "$USER" != 'root' ]]; then
-	echo "Sorry, you need to run this as root"
+	echo "К сожалению, скрипт должен быть запущен с правами root"
 	exit
 fi
 
 
 if [[ ! -e /dev/net/tun ]]; then
-	echo "TUN/TAP is not available"
+	echo "TUN/TAP недоступен"
 	exit
 fi
 
 
 if grep -qs "CentOS release 5" "/etc/redhat-release"; then
-	echo "CentOS 5 is too old and not supported"
+	echo "CentOS 5 очень старая версия и не поддерживается"
 	exit
 fi
 
@@ -27,7 +27,7 @@ elif [[ -e /etc/centos-release || -e /etc/redhat-release ]]; then
 	# Needed for CentOS 7
 	chmod +x /etc/rc.d/rc.local
 else
-	echo "Looks like you aren't running this installer on a Debian, Ubuntu or CentOS system"
+	echo "Похоже, вы не используете эту программу установки в системе Debian, Ubuntu или CentOS"
 	exit
 fi
 
@@ -59,23 +59,23 @@ if [[ -e /etc/openvpn/server.conf ]]; then
 	while :
 	do
 	clear
-		echo "Looks like OpenVPN is already installed"
+		echo "Похоже, OpenVPN уже установлен"
 		echo ""
-		echo "What do you want to do?"
-		echo "   1) Add a cert for a new user"
-		echo "   2) Revoke existing user cert"
-		echo "   3) Remove OpenVPN"
-		echo "   4) Exit"
-		read -p "Select an option [1-4]: " option
+		echo "Что вы хотите сделать?"
+		echo "   1) Добавьте сертификат для нового пользователя"
+		echo "   2) Отозвать существующий сертификат"
+		echo "   3) Удалить OpenVPN"
+		echo "   4) Выйти"
+		read -p "Выберите опцию [1-4]: " option
 		case $option in
 			1)
 			echo ""
-			echo "Tell me a name for the client cert"
-			echo "Please, use one word only, no special characters"
-			read -p "Client name: " -e -i client CLIENT
+			echo "Укажите имя пользователя"
+			echo "Пожалуйста, используйте только одно слово, без спецсимволов"
+			read -p "Имя пользователя: " -e -i client CLIENT
 			cd /etc/openvpn/easy-rsa/
-			read -p "Key size (client): " -e -i 4096 KEYSIZE_CLIENT
-			read -p "Use password (client)? " -e -i y USEPASS_CLIENT
+			read -p "Длинна ключа (пользователя): " -e -i 4096 KEYSIZE_CLIENT
+			read -p "Использовать пароль (пользователя)? " -e -i y USEPASS_CLIENT
 			if [ $USEPASS_CLIENT != "y" ]; then
 				./easyrsa --keysize=$KEYSIZE_CLIENT build-client-full $CLIENT nopass
 			else
@@ -84,7 +84,7 @@ if [[ -e /etc/openvpn/server.conf ]]; then
 			# Generates the custom client.ovpn
 			newclient "$CLIENT"
 			echo ""
-			echo "Client $CLIENT added, certs available at ~/$CLIENT.ovpn"
+			echo "Пользователь $CLIENT добавлен, сертификаты доступны в ~/$CLIENT.ovpn"
 			exit
 			;;
 			2)
@@ -93,16 +93,16 @@ if [[ -e /etc/openvpn/server.conf ]]; then
 			NUMBEROFCLIENTS=$(tail -n +2 /etc/openvpn/easy-rsa/pki/index.txt | grep -c "^V")
 			if [[ "$NUMBEROFCLIENTS" = '0' ]]; then
 				echo ""
-				echo "You have no existing clients!"
+				echo "У вас нет существующих пользователей!"
 				exit
 			fi
 			echo ""
-			echo "Select the existing client certificate you want to revoke"
+			echo "Выберите сертификат клиента, который вы хотите отменить"
 			tail -n +2 /etc/openvpn/easy-rsa/pki/index.txt | grep "^V" | cut -d '=' -f 2 | nl -s ') '
 			if [[ "$NUMBEROFCLIENTS" = '1' ]]; then
-				read -p "Select one client [1]: " CLIENTNUMBER
+				read -p "Выберите пользователя [1]: " CLIENTNUMBER
 			else
-				read -p "Select one client [1-$NUMBEROFCLIENTS]: " CLIENTNUMBER
+				read -p "Выберите пользователя [1-$NUMBEROFCLIENTS]: " CLIENTNUMBER
 			fi
 			CLIENT=$(tail -n +2 /etc/openvpn/easy-rsa/pki/index.txt | grep "^V" | cut -d '=' -f 2 | sed -n "$CLIENTNUMBER"p)
 			cd /etc/openvpn/easy-rsa/
@@ -119,12 +119,12 @@ if [[ -e /etc/openvpn/server.conf ]]; then
 				fi
 			fi
 			echo ""
-			echo "Certificate for client $CLIENT revoked"
+			echo "Сертификат пользователя $CLIENT отозван"
 			exit
 			;;
 			3)
 			echo ""
-			read -p "Do you really want to remove OpenVPN? [y/n]: " -e -i n REMOVE
+			read -p "Вы действительно хотите удалить OpenVPN? [y/n]: " -e -i n REMOVE
 			if [[ "$REMOVE" = 'y' ]]; then
 				PORT=$(grep '^port ' /etc/openvpn/server.conf | cut -d " " -f 2)
 				if pgrep firewalld; then
@@ -148,10 +148,10 @@ if [[ -e /etc/openvpn/server.conf ]]; then
 				rm -rf /etc/openvpn
 				rm -rf /usr/share/doc/openvpn*
 				echo ""
-				echo "OpenVPN removed!"
+				echo "OpenVPN удален!"
 			else
 				echo ""
-				echo "Removal aborted!"
+				echo "Удаление отменено!"
 			fi
 			exit
 			;;
@@ -160,20 +160,20 @@ if [[ -e /etc/openvpn/server.conf ]]; then
 	done
 else
 	clear
-	echo 'Welcome to this quick OpenVPN "road warrior" installer'
+	echo 'Добро пожаловать в установщик OpenVPN'
 	echo ""
 	# OpenVPN setup and first user creation
-	echo "I need to ask you a few questions before starting the setup"
-	echo "You can leave the default options and just press enter if you are ok with them"
+	echo "Мне нужно задать вам несколько вопросов, прежде чем начать установку"
+	echo "Вы можете оставить настройки по умолчанию и просто нажать клавишу ВВОД"
 	echo ""
-	echo "First I need to know the IPv4 address of the network interface you want OpenVPN"
-	echo "listening to."
-	read -p "IP address: " -e -i $IP IP
+	echo "Укажите адрес IPv4 сетевого интерфейса который вы хотите использовать для OpenVPN"
+	echo "следовать."
+	read -p "IP адрес: " -e -i $IP IP
 	echo ""
-	echo "What port do you want for OpenVPN?"
-	read -p "Port: " -e -i 1194 PORT
+	echo "Укажите порт для OpenVPN?"
+	read -p "Порт: " -e -i 1194 PORT
 	echo ""
-	echo "What DNS do you want to use with the VPN?"
+	echo "Какие DNS вы хотите использовать для VPN?"
 	echo "   1) Current system resolvers"
 	echo "   2) OpenDNS"
 	echo "   3) Level 3"
@@ -182,8 +182,8 @@ else
 	echo "   6) Google"
 	read -p "DNS [1-6]: " -e -i 1 DNS
 	echo ""
-	echo "Okay, that was all I needed. We are ready to setup your OpenVPN server now"
-	read -n1 -r -p "Press any key to continue..."
+	echo "Все готово. Ваш сервер OpenVPN можно настроить прямо сейчас"
+	read -n1 -r -p "Нажмите любую клавишу для продолжения..."
 		if [[ "$OS" = 'debian' ]]; then
 		apt-get update
 		apt-get install openvpn iptables openssl -y
@@ -209,19 +209,19 @@ else
 	./easyrsa --batch build-ca nopass
 	./easyrsa gen-dh
 	echo ""
-        read -p "Key size (server): " -e -i 4096 KEYSIZE_SERVER
-        read -p "Use password (server)? " -e -i y USEPASS_SERVER
+        read -p "Длинна ключа (сервера): " -e -i 4096 KEYSIZE_SERVER
+        read -p "Использовать пароль (сервера)? " -e -i y USEPASS_SERVER
         if [ $USEPASS_SERVER != "y" ]; then
 		./easyrsa --keysize=$KEYSIZE_SERVER build-server-full server nopass
 	else
 		./easyrsa --keysize=$KEYSIZE_SERVER build-server-full server
 	fi
 	echo ""
-        echo "Finally, tell me your name for the client cert"
-        echo "Please, use one word only, no special characters"
-        read -p "Client name: " -e -i client CLIENT
-        read -p "Key size (client): " -e -i 4096 KEYSIZE_CLIENT
-        read -p "Use password (client)? " -e -i y USEPASS_CLIENT
+        echo "Укажите имя пользователя для сертификата"
+        echo "Пожалуйста, используйте только одно слово, без спецсимволов"
+        read -p "Имя пользователя: " -e -i client CLIENT
+        read -p "Длинна ключа (пользователя): " -e -i 4096 KEYSIZE_CLIENT
+        read -p "Использовать пароль (пользователя)? " -e -i y USEPASS_CLIENT
          if [ $USEPASS_CLIENT != "y" ]; then
 	         ./easyrsa --keysize=$KEYSIZE_CLIENT build-client-full $CLIENT nopass
          else
@@ -334,11 +334,11 @@ crl-verify /etc/openvpn/easy-rsa/pki/crl.pem" >> /etc/openvpn/server.conf
 	EXTERNALIP=$(wget -qO- ipv4.icanhazip.com)
 	if [[ "$IP" != "$EXTERNALIP" ]]; then
 		echo ""
-		echo "Looks like your server is behind a NAT!"
+		echo "Похоже, ваш сервер находится за NAT!"
 		echo ""
-		echo "If your server is NATed (LowEndSpirit), I need to know the external IP"
-		echo "If that's not the case, just ignore this and leave the next field blank"
-		read -p "External IP: " -e USEREXTERNALIP
+		echo "Если ваш сервер находится за NAT (LowEndSpirit), укажите внешний IP"
+		echo "Если это не так, просто проигнорируйте и оставьте поле пустым"
+		read -p "Внешний IP: " -e USEREXTERNALIP
 		if [[ "$USEREXTERNALIP" != "" ]]; then
 			IP=$USEREXTERNALIP
 		fi
@@ -360,8 +360,8 @@ verb 3" > /etc/openvpn/client-common.txt
 	# Generates the custom client.ovpn
 	newclient "$CLIENT"
 	echo ""
-	echo "Finished!"
+	echo "Готово!"
 	echo ""
-	echo "Your client config is available at ~/$CLIENT.ovpn"
-	echo "If you want to add more clients, you simply need to run this script another time!"
+	echo "Ваша конфигурация пользователя доступна в ~/$CLIENT.ovpn"
+	echo "Если вы хотите добавить больше пользователей, запустите этот сценарий еще раз!"
 fi

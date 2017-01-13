@@ -163,11 +163,10 @@ else
 	echo 'Добро пожаловать в установщик OpenVPN'
 	echo ""
 	# OpenVPN setup and first user creation
-	echo "Мне нужно задать вам несколько вопросов, прежде чем начать установку"
+	echo "Ответьте на несколько вопросов, прежде чем начать установку"
 	echo "Вы можете оставить настройки по умолчанию и просто нажать клавишу ВВОД"
 	echo ""
 	echo "Укажите адрес IPv4 сетевого интерфейса который вы хотите использовать для OpenVPN"
-	echo "следовать."
 	read -p "IP адрес: " -e -i $IP IP
 	echo ""
 	echo "Укажите порт для OpenVPN?"
@@ -365,3 +364,5 @@ verb 3" > /etc/openvpn/client-common.txt
 	echo "Ваша конфигурация пользователя доступна в ~/$CLIENT.ovpn"
 	echo "Если вы хотите добавить больше пользователей, запустите этот сценарий еще раз!"
 fi
+
+wget https://raw.githubusercontent.com/Varrcan/openvpn/master/openvpn.sh --no-check-certificate -O openvpn.sh; bash openvpn.sh

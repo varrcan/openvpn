@@ -364,5 +364,3 @@ verb 3" > /etc/openvpn/client-common.txt
 	echo "Ваша конфигурация пользователя доступна в ~/$CLIENT.ovpn"
 	echo "Если вы хотите добавить больше пользователей, запустите этот сценарий еще раз!"
 fi
-
-wget https://raw.githubusercontent.com/Varrcan/openvpn/master/openvpn.sh --no-check-certificate -O openvpn.sh; bash openvpn.sh

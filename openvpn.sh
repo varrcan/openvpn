@@ -141,7 +141,7 @@ if [[ -e /etc/openvpn/server.conf ]]; then
 				fi
 				sed -i '/iptables -t nat -A POSTROUTING -s 10.8.0.0\/24 -j SNAT --to /d' $RCLOCAL
 				if [[ "$OS" = 'debian' ]]; then
-					apt-get remove --purge -y openvpn openvpn-blacklist
+					apt purge -y openvpn
 				else
 					yum remove openvpn -y
 				fi
@@ -184,8 +184,8 @@ else
 	echo "Все готово. Ваш сервер OpenVPN можно настроить прямо сейчас"
 	read -n1 -r -p "Нажмите любую клавишу для продолжения..."
 		if [[ "$OS" = 'debian' ]]; then
-		apt-get update
-		apt-get install openvpn iptables openssl -y
+		apt update
+		apt install openvpn iptables openssl -y
 	else
 		# Else, the distro is CentOS
 		yum install epel-release -y
@@ -196,12 +196,12 @@ else
 		rm -rf /etc/openvpn/easy-rsa/
 	fi
 	# Get easy-rsa
-	wget --no-check-certificate -O ~/EasyRSA-3.0.0.tgz https://github.com/OpenVPN/easy-rsa/releases/download/3.0.0/EasyRSA-3.0.0.tgz
-	tar xzf ~/EasyRSA-3.0.0.tgz -C ~/
-	mv ~/EasyRSA-3.0.0/ /etc/openvpn/
-	mv /etc/openvpn/EasyRSA-3.0.0/ /etc/openvpn/easy-rsa/
+	wget --no-check-certificate -O ~/EasyRSA-3.0.8.tgz https://github.com/OpenVPN/easy-rsa/releases/download/v3.0.8/EasyRSA-3.0.8.tgz
+	tar xzf ~/EasyRSA-3.0.8.tgz -C ~/
+	mv ~/EasyRSA-3.0.8/ /etc/openvpn/
+	mv /etc/openvpn/EasyRSA-3.0.8/ /etc/openvpn/easy-rsa/
 	chown -R root:root /etc/openvpn/easy-rsa/
-	rm -rf ~/EasyRSA-3.0.0.tgz
+	rm -rf ~/EasyRSA-3.0.8.tgz
 	cd /etc/openvpn/easy-rsa/
 	# Create the PKI, set up the CA, the DH params and the server + client certificates
 	./easyrsa init-pki
@@ -210,7 +210,7 @@ else
 	echo ""
         read -p "Длинна ключа (сервера): " -e -i 4096 KEYSIZE_SERVER
         read -p "Использовать пароль (сервера)? " -e -i y USEPASS_SERVER
-        if [ $USEPASS_SERVER != "y" ]; then
+        if [ $USEPASS_SERVER != "n" ]; then
 		./easyrsa --keysize=$KEYSIZE_SERVER build-server-full server nopass
 	else
 		./easyrsa --keysize=$KEYSIZE_SERVER build-server-full server
